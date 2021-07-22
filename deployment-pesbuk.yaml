@@ -78,7 +78,7 @@ apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: ingress
-  namespsace: production
+  namespace: production
 spec:
   backend:
     serviceName: pesbuk-service
