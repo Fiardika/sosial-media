@@ -1,0 +1,115 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: production
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pesbuk-deployment
+  namespace: production
+  labels:
+    app: pesbuk-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pesbuk-deployment
+  template:
+    metadata:
+      labels:
+        app: pesbuk-deployment
+    spec:
+      volumes:
+        - name: config-secret
+          configMap:
+            name: p-fb-configmap-secret
+      containers:
+      - name: pesbuk-deployment
+        image: fiardika/pesbuk-jenkins:latest
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: config-secret
+          mountPath: "/var/www/html/config.php"
+          subPath: "config.php"
+        env:
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: p-secret-fb
+              key: DB_USER
+        - name: DB_PASS
+          valueFrom:
+            secretKeyRef:
+              name: p-secret-fb
+              key: DB_PASS
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: pesbuk-service
+  namespace: production
+spec:
+  selector:
+    app: pesbuk-deployment
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress
+  namespace: production
+  annotations:
+spec:
+  rules:
+   - host: pesbuk.fiardika.xyz
+    http:
+      paths:
+        - backend:
+            serviceName: pesbuk-service
+            servicePort: 80
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: p-fb-configmap-secret
+data:
+  config.php: |
+    <?php
+    $db_host = getenv("DB_HOST");
+    $db_user = getenv("DB_USER");
+    $db_pass = getenv("DB_PASS");
+    $db_name = getenv("DB_NAME");
+    try {    
+      //create PDO connection
+      $db = new PDO("mysql:host=$db_host;dbname=$db_name", $db_user, $db_pass);
+    } catch(PDOException $e) {
+      //show error
+      die("Terjadi masalah: " . $e->getMessage());
+    }
+    ?>
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: p-secret-fb
+type: Opaque
+data:
+  DB_HOST: YmlncHJvZGIuY2ZpZ2R3eW1jNnc5LmFwLXNvdXRoZWFzdC0xLnJkcy5hbWF6b25hd3MuY29t
+  DB_USER: ZGV2b3BzY2lsc3k=
+  DB_PASS: MTIzNDU2Nzg5MA==
+  DB_NAME: ZGJuYW1l
