@@ -9,6 +9,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: pesbuk-deployment
+  namespace: production
   labels:
     app: pesbuk-deployment
 spec:
