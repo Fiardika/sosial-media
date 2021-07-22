@@ -1,0 +1,14 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress
+  namespace: production
+  annotations:
+spec:
+  rules:
+  - host: fiardika.fiardika.xyz
+    http:
+      paths:
+        - backend:
+            serviceName: landing-page-service
+            servicePort: 80
