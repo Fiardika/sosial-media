@@ -51,7 +51,7 @@ spec:
             secretKeyRef:
               name: p-secret-fb
               key: DB_PASS
-         - name: DB_NAME
+        - name: DB_NAME
           valueFrom:
             secretKeyRef:
               name: p-secret-fb
