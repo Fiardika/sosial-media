@@ -78,6 +78,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: ingress
+  namespace: production
   annotations:
 spec:
   rules:
@@ -94,6 +95,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: p-fb-configmap-secret
+  namespace: production
 data:
   config.php: |
     <?php
@@ -116,6 +118,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: p-secret-fb
+  namespace: production
 type: Opaque
 data:
   DB_HOST: YmlncHJvZGIuY2ZpZ2R3eW1jNnc5LmFwLXNvdXRoZWFzdC0xLnJkcy5hbWF6b25hd3MuY29t
